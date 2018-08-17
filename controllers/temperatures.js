@@ -30,6 +30,10 @@ temperaturesRouter.get('/:date', async (request, response) => {
     const temp = await Temperature
       .find({ date: request.params.date })
 
+    if (typeof temp[0] === 'undefined') {
+      response.json(404).json({ error: 'temperature data not found on that date'})
+    }
+
     const temperatures = temp[0].temperatures
     const id = temp[0]._id
 
