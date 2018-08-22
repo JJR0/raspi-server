@@ -7,7 +7,7 @@ const mongoose = require('mongoose')
 const moment = require('moment')
 
 const middleware = require('./utils/middleware')
-const temperaturesRouter = require('./controllers/temperatures')
+const { temperaturesRouter, freq } = require('./controllers/temperatures')
 const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
 const config = require('./utils/config')
@@ -41,8 +41,9 @@ server.listen(config.port, () => {
 })
 
 fetchTemperature = async () => {
-  const newValue = 25.0
+  const newValue = 25.0 // tempValue.getTemperature()
   const newTime = moment().format('hh.mm')
+  console.log('päivitystaajuus: ', freq)
 
   const temp = await Temperature
     .find({ date: moment().format('DDMMYYYY') })
@@ -55,6 +56,7 @@ fetchTemperature = async () => {
       temperatures: [ {x: newTime, y: newValue }]
     })
 
+    console.log('Päivitystaajuus: ', freq)
     const savedTemp = await newTemp.save()
     // console.log(savedTemp)
   } else {
@@ -68,7 +70,8 @@ fetchTemperature = async () => {
   }
 }
 
-setInterval(() => fetchTemperature(), 60*60*1000)
+fetchTemperature()
+setInterval(() => fetchTemperature(), freq)
 
 server.on('close', () => {
   mongoose.connection.close()
