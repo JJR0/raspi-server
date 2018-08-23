@@ -1,7 +1,7 @@
 const temperaturesRouter = require('express').Router()
 const Temperature = require('../models/temperature')
-//const tempValue = require('rpi-temperature')
-let freq = 600000
+const tempValue = require('rpi-temperature')
+let freq = 1800000
 
 temperaturesRouter.get('/', async (request, response) => {
   try {
@@ -17,7 +17,8 @@ temperaturesRouter.get('/', async (request, response) => {
 
 temperaturesRouter.get('/now', async (request, response) => {
   try {
-    response.json(25) // tempValue.getTemperature()
+    response.json(tempValue.getTemperature())
+    console.log('Tämän hetken lämpötila: ', tempValue.getTemperature())
   } catch (exception) {
     console.log(exception)
     response.status(500).json({ error: 'something went wrong' })

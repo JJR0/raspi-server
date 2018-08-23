@@ -12,10 +12,12 @@ const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
 const config = require('./utils/config')
 const Temperature = require('./models/temperature')
-//const tempValue = require('rpi-temperature')
+const tempValue = require('rpi-temperature')
+
+moment.locale('fi')
 
 mongoose
-  .connect(config.mongoUrl, { useNewUrlParser: true })
+  .connect('mongodb://raspi:vadelma1@ds255260.mlab.com:55260/raspberry-temperature', { useNewUrlParser: true })
   .then( () => {
     console.log('Connected to MongoDB database: ', config.mongoUrl)
   })
@@ -25,6 +27,7 @@ mongoose
 
 app.use(cors())
 app.use(bodyParser.json())
+app.use(express.static('build'))
 app.use(middleware.logger)
 
 app.use('/api/temperature', temperaturesRouter)
@@ -36,13 +39,14 @@ app.use(middleware.error)
 
 const server = http.createServer(app)
 
-server.listen(config.port, () => {
-  console.log(`Server running on port ${config.port}`)
+const PORT = 5000
+server.listen(PORT, () => {
+  console.log("Server running on port: ", PORT)
 })
 
 fetchTemperature = async () => {
-  const newValue = 25.0 // tempValue.getTemperature()
-  const newTime = moment().format('hh.mm')
+  const newValue = tempValue.getTemperature()
+  const newTime = moment().format('HH.mm')
   console.log('päivitystaajuus: ', freq)
 
   const temp = await Temperature
