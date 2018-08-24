@@ -7,15 +7,15 @@ let mongoUrl = process.env.MONGODB_URI
 
 if (process.env.NODE_ENV === 'test') {
   port = process.env.TEST_PORT
-  mongoUrl = process.env.TEST_MONGODB_URI
+  mongoUrl = process.env.MONGODB_URI_DEV
 }
 
 if (process.env.NODE_ENV === 'development') {
-  port = process.env.PORT
+  port = process.env.TEST_PORT
   mongoUrl = process.env.MONGODB_URI_DEV
 }
 
 module.exports = {
   mongoUrl,
-  port
+  port,
 }
