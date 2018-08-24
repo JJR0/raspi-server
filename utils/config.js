@@ -10,6 +10,11 @@ if (process.env.NODE_ENV === 'test') {
   mongoUrl = process.env.TEST_MONGODB_URI
 }
 
+if (process.env.NODE_ENV === 'development') {
+  port = process.env.PORT
+  mongoUrl = process.env.MONGODB_URI_DEV
+}
+
 module.exports = {
   mongoUrl,
   port

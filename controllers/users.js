@@ -14,11 +14,11 @@ usersRouter.post('/', async (request, response) => {
     const { username, password } = request.body
     console.log(request.body)
 
-    if ( password.length<3 ) {
+    if (password.length < 3) {
       return response.status(400).json({ error: 'password too short' })
     }
 
-    const existing = await User.findOne({username})
+    const existing = await User.findOne({ username })
     if (existing) {
       return response.status(400).json({ error: 'username must be unique' })
     }
@@ -28,7 +28,7 @@ usersRouter.post('/', async (request, response) => {
 
     const user = new User({
       username,
-      passwordHash
+      passwordHash,
     })
 
     const savedUser = await user.save()
