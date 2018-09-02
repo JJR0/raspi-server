@@ -1,6 +1,7 @@
 const temperaturesRouter = require('express').Router()
 const Temperature = require('../models/temperature')
 const tempValue = require('rpi-temperature')
+const moment = require('moment')
 let freq = 1800000
 
 temperaturesRouter.get('/', async (request, response) => {
@@ -49,7 +50,6 @@ temperaturesRouter.get('/:date', async (request, response) => {
 
 temperaturesRouter.post('/', (request, response) => {
   const updateFreq = request.body
-  // console.log(updateFreq)
 
   if (Object.keys(updateFreq).length === 0 && updateFreq.constructor === Object) {
     response.status(400).json({ error: 'content missing' })
@@ -62,6 +62,15 @@ temperaturesRouter.post('/', (request, response) => {
 temperaturesRouter.post('/olohuone', (request, response) => {
   const body = request.body
   response.json(body['temp'])
+})
+
+temperaturesRouter.get('/min', async (request, response) => {
+  try {
+    const date = moment().format('DDMMYYYY')
+      console.log('date  
+  } catch (exception) {
+    console.log(exception)
+  }  
 })
 
 module.exports = { temperaturesRouter, freq }
