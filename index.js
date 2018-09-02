@@ -1,6 +1,5 @@
 const http = require('http')
 const express = require('express')
-const app = express()
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const mongoose = require('mongoose')
@@ -14,14 +13,18 @@ const config = require('./utils/config')
 const Temperature = require('./models/temperature')
 const tempValue = require('rpi-temperature')
 
+const app = express()
+
 moment.locale('fi')
 
+require('dotenv').config()
+
 mongoose
-  .connect('mongodb://raspi:vadelma1@ds255260.mlab.com:55260/raspberry-temperature', { useNewUrlParser: true })
-  .then( () => {
-    console.log('Connected to MongoDB database: ', config.mongoUrl)
+  .connect(process.env.MONGODB_URI, { useNewUrlParser: true })
+  .then(() => {
+    console.log('Connected to MongoDB database: ', process.env.MONGOBB_URI)
   })
-  .catch( error => {
+  .catch((error) => {
     console.log(error)
   })
 
@@ -41,36 +44,33 @@ const server = http.createServer(app)
 
 const PORT = 5000
 server.listen(PORT, () => {
-  console.log("Server running on port: ", PORT)
+  console.log('Server running on port: ', PORT)
 })
 
-fetchTemperature = async () => {
+const fetchTemperature = async () => {
   const newValue = tempValue.getTemperature()
   const newTime = moment().format('HH.mm')
-  console.log('päivitystaajuus: ', freq)
 
   const temp = await Temperature
     .find({ date: moment().format('DDMMYYYY') })
 
-  // console.log(temp)
-
   if (typeof temp[0] === 'undefined') {
     const newTemp = new Temperature({
       date: moment().format('DDMMYYYY'),
-      temperatures: [ {x: newTime, y: newValue }]
+      temperatures: [{ x: newTime, y: newValue }],
     })
 
-    console.log('Päivitystaajuus: ', freq)
-    const savedTemp = await newTemp.save()
-    // console.log(savedTemp)
+    await newTemp.save()
   } else {
     const temperatures = temp[0].temperatures
     const id = temp[0]._id
-  
+
     await Temperature
-      .findByIdAndUpdate({ _id: id }, {temperatures: temperatures.concat([{ x: newTime, y: newValue }])})
-    const result = await Temperature.findById(id)
-    // console.log(result)
+      .findByIdAndUpdate(
+        { _id: id },
+        { temperatures: temperatures.concat([{ x: newTime, y: newValue }]) },
+      )
+    await Temperature.findById(id)
   }
 }
 
@@ -82,5 +82,5 @@ server.on('close', () => {
 })
 
 module.exports = {
-  app, server
+  app, server,
 }

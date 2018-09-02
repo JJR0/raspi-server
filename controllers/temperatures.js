@@ -31,14 +31,14 @@ temperaturesRouter.get('/:date', async (request, response) => {
       .find({ date: request.params.date })
 
     if (typeof temp[0] === 'undefined') {
-      response.status(404).json({ error: 'temperature data not found on that date'})
+      response.status(404).json({ error: 'temperature data not found on that date' })
     } else {
-      const temperatures = temp[0].temperatures
-      const id = temp[0]._id
-  
-      console.log('löydetty temp: ', temp)
-      console.log('löydetty temp: ', id)
-  
+      // const temperatures = temp[0].temperatures
+      // const id = temp[0]._id
+
+      // console.log('löydetty temp: ', temperatures)
+      // console.log('löydetty temp: ', id)
+
       response.json(temp)
     }
   } catch (exception) {
