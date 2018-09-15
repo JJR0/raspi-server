@@ -1,11 +1,12 @@
 const temperaturesRouter = require('express').Router()
 const Temperature = require('../models/temperature')
+const moment = require('moment')
+
+moment.locale('fi')
 
 // For production
 // const tempValue = require('rpi-temperature')
 
-// For development
-const tempValue = 25
 let freq = 1800000
 
 // Hakee kaiken datan
@@ -24,8 +25,13 @@ temperaturesRouter.get('/', async (request, response) => {
 // Hakee tämän hetken sisälämpötilan
 temperaturesRouter.get('/now', async (request, response) => {
   try {
-    response.json(tempValue.getTemperature())
-    console.log('Tämän hetken lämpötila: ', tempValue.getTemperature())
+    // For production
+    // response.json(tempValue.getTemperature())
+    // console.log('Tämän hetken lämpötila: ', tempValue.getTemperature())
+
+    // For development
+    response.json(25)
+
   } catch (exception) {
     console.log(exception)
     response.status(500).json({ error: 'something went wrong' })
@@ -59,14 +65,89 @@ temperaturesRouter.post('/', (request, response) => {
   response.json(freq)
 })
 
-temperaturesRouter.post('/olohuone', (request, response) => {
-  const body = request.body
-  response.json(body['temp'])
+temperaturesRouter.post('/olohuone', async (request, response) => {
+  try {
+    const body = request.body
+    console.log('Olohuoneen lämpötila: ', body['olohuone'])
+
+    if (body['olohuone'] === null || body['olohuone'] === undefined) {
+      response.status(400).json({ error: 'incorrect body structure in request' })
+      return
+    }
+
+    const newValue = body['olohuone']
+    const newTime = moment().format('HH.mm')
+
+    const temp = await Temperature
+      .find({ date: moment().format('DDMMYYYY') })
+
+    if (typeof temp[0] === 'undefined') {
+      const newTemp = new Temperature({
+        date: moment().format('DDMMYYYY'),
+        livingroom_temp: [{ x: newTime, y: newValue }],
+      })
+
+      const result = await newTemp.save()
+      response.json(result)
+    } else {
+      const livingroom_temp = temp[0].livingroom_temp
+      const id = temp[0]._id
+
+      await Temperature
+        .findByIdAndUpdate(
+          { _id: id },
+          { livingroom_temp: livingroom_temp.concat([{ x: newTime, y: newValue }]) },
+        )
+      const result = await Temperature.findById(id)
+      response.json(result)
+    }
+  } catch (exception) {
+    console.log(exception)
+    response.status(500).json({ error: 'something went wrong' })
+  }
 })
 
-temperaturesRouter.post('/ulko', (request, response) => {
-  const body = request.body
-  response.json(body['ulko'])
+temperaturesRouter.post('/ulko', async (request, response) => {
+  try {
+    const body = request.body
+    console.log('Ulkolämpötila: ', body['ulko'])
+
+    if (body['ulko'] === null || body['ulko'] === undefined) {
+      response.status(400).json({ error: 'incorrect body structure in request' })
+      return
+    }
+
+    const newValue = body['ulko']
+    const newTime = moment().format('HH.mm')
+
+    const temp = await Temperature
+      .find({ date: moment().format('DDMMYYYY') })
+
+    if (typeof temp[0] === 'undefined') {
+      const newTemp = new Temperature({
+        date: moment().format('DDMMYYYY'),
+        outside_temp: [{ x: newTime, y: newValue }],
+      })
+
+      const result = await newTemp.save()
+      response.json(result)
+    } else {
+      const outside_temp = temp[0].outside_temp
+      const id = temp[0]._id
+
+      await Temperature
+        .findByIdAndUpdate(
+          { _id: id },
+          { outside_temp: outside_temp.concat([{ x: newTime, y: newValue }]) },
+        )
+      const result = await Temperature.findById(id)
+
+      response.json(result)
+    }
+  } catch (exception) {
+    console.log(exception)
+    response.status(500).json({ error: 'something went wrong' })
+  }
 })
 
 module.exports = { temperaturesRouter, freq }

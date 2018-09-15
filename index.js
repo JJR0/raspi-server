@@ -70,7 +70,12 @@ server.listen(PORT_DEV, () => {
 })
 
 const fetchTemperature = async () => {
-  const newValue = tempValue.getTemperature()
+  // For production
+  // const newValue = tempValue.getTemperature()
+
+  // For development
+  const newValue = 25
+
   const newTime = moment().format('HH.mm')
 
   const temp = await Temperature
