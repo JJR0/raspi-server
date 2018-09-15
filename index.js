@@ -9,9 +9,13 @@ const middleware = require('./utils/middleware')
 const { temperaturesRouter, freq } = require('./controllers/temperatures')
 const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
-const config = require('./utils/config')
 const Temperature = require('./models/temperature')
-const tempValue = require('rpi-temperature')
+
+// For production
+// const tempValue = require('rpi-temperature')
+
+// For development
+const tempValue = 25
 
 const app = express()
 
@@ -19,10 +23,21 @@ moment.locale('fi')
 
 require('dotenv').config()
 
+// For production
+// mongoose
+//   .connect(process.env.MONGODB_URI, { useNewUrlParser: true })
+//   .then(() => {
+//     console.log('Connected to MongoDB database: ', process.env.MONGOBB_URI)
+//   })
+//   .catch((error) => {
+//     console.log(error)
+//   })
+
+// For development
 mongoose
-  .connect(process.env.MONGODB_URI, { useNewUrlParser: true })
+  .connect(process.env.MONGODB_URI_DEV, { useNewUrlParser: true })
   .then(() => {
-    console.log('Connected to MongoDB database: ', process.env.MONGOBB_URI)
+    console.log('Connected to MongoDB database: ', process.env.MONGOBB_URI_DEV)
   })
   .catch((error) => {
     console.log(error)
@@ -42,9 +57,16 @@ app.use(middleware.error)
 
 const server = http.createServer(app)
 
-const PORT = 5000
-server.listen(PORT, () => {
-  console.log('Server running on port: ', PORT)
+// For production
+// const PORT = 5000
+// server.listen(PORT, () => {
+//   console.log('Server running on port: ', PORT)
+// })
+
+// For development
+const PORT_DEV = 5001
+server.listen(PORT_DEV, () => {
+  console.log('Server running on port: ', PORT_DEV)
 })
 
 const fetchTemperature = async () => {

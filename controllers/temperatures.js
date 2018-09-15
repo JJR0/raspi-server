@@ -1,8 +1,14 @@
 const temperaturesRouter = require('express').Router()
 const Temperature = require('../models/temperature')
-const tempValue = require('rpi-temperature')
+
+// For production
+// const tempValue = require('rpi-temperature')
+
+// For development
+const tempValue = 25
 let freq = 1800000
 
+// Hakee kaiken datan
 temperaturesRouter.get('/', async (request, response) => {
   try {
     const temperatures = await Temperature
@@ -15,6 +21,7 @@ temperaturesRouter.get('/', async (request, response) => {
   }
 })
 
+// Hakee tämän hetken sisälämpötilan
 temperaturesRouter.get('/now', async (request, response) => {
   try {
     response.json(tempValue.getTemperature())
