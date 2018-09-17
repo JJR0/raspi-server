@@ -5,7 +5,7 @@ const moment = require('moment')
 moment.locale('fi')
 
 // For production
- const tempValue = require('rpi-temperature')
+// const tempValue = require('rpi-temperature')
 
 let freq = 1800000
 
@@ -26,11 +26,11 @@ temperaturesRouter.get('/', async (request, response) => {
 temperaturesRouter.get('/now', async (request, response) => {
   try {
     // For production
-    response.json(tempValue.getTemperature())
-    console.log('Tämän hetken lämpötila: ', tempValue.getTemperature())
+    // response.json(tempValue.getTemperature())
+    // console.log('Tämän hetken lämpötila: ', tempValue.getTemperature())
 
     // For development
-    // response.json(25)
+    response.json(25)
 
   } catch (exception) {
     console.log(exception)
